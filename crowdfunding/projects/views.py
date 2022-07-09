@@ -10,6 +10,8 @@ from .permissions import IsOwnerOrReadOnly
 # Create your views here.
 # /Pledges/
 class PledgeList(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+    IsOwnerOrReadOnly]
     # GET request
     def get(self, request):
         pledges = Pledge.objects.all()
@@ -22,6 +24,12 @@ class PledgeList(APIView):
             serializer.save(supporter=request.user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        pledge= self.get_object(pk)
+        pledge.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ProjectList(APIView):
     
